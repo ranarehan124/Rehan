@@ -4,8 +4,7 @@
   "description": "All-in-one social media downloader, video-to-audio converter, and AI assist app with a charcoal, neon yellow, teal, and dark purple interface.",
   "main": "server.js",
   "scripts": {
-    "start": "node server.js",
-    "postinstall": "python3 -m pip install yt-dlp --upgrade || python -m pip install yt-dlp --upgrade"
+    "start": "node server.js"
   },
   "engines": {
     "node": ">=18"
