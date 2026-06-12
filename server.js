@@ -45,12 +45,32 @@ function parseJsonOutput(raw) {
   }
 }
 
+function getYtDlpPath() {
+  const { execSync } = require('child_process');
+  const candidates = ['yt-dlp', '/usr/bin/yt-dlp', '/usr/local/bin/yt-dlp'];
+  for (const bin of candidates) {
+    try {
+      execSync(`${bin} --version`, { stdio: 'ignore' });
+      return bin;
+    } catch (_) {}
+  }
+  // try which
+  try {
+    return execSync('which yt-dlp').toString().trim();
+  } catch (_) {}
+  return null;
+}
+
+const YT_DLP_PATH = getYtDlpPath();
+
 function runYtDlpCommand(args) {
-  const commandCandidates = [
-    ['yt-dlp'],
-    ['python', '-m', 'yt_dlp'],
-    ['python3', '-m', 'yt_dlp'],
-  ];
+  const commandCandidates = YT_DLP_PATH
+    ? [[YT_DLP_PATH]]
+    : [
+        ['yt-dlp'],
+        ['python3', '-m', 'yt_dlp'],
+        ['python', '-m', 'yt_dlp'],
+      ];
 
   const runCommand = (command, commandArgs) => new Promise((resolve, reject) => {
     const yt = spawn(command, commandArgs, {
