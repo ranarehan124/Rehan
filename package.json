@@ -9,16 +9,7 @@
   "engines": {
     "node": ">=18"
   },
-  "keywords": [
-    "social",
-    "media",
-    "downloader",
-    "video",
-    "audio",
-    "converter",
-    "ai",
-    "groq"
-  ],
+  "keywords": ["social", "media", "downloader", "video", "audio", "converter", "ai", "groq"],
   "dependencies": {
     "axios": "^1.6.5",
     "cors": "^2.8.6",
