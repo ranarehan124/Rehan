@@ -1,2 +1,11 @@
 [phases.setup]
-nixPkgs = ["python3", "python312Packages.pip", "yt-dlp"]
+nixPkgs = ["nodejs_20", "python3", "python312Packages.pip", "curl", "yt-dlp"]
+
+[phases.install]
+cmds = ["npm ci"]
+
+[phases.build]
+cmds = ["echo build done"]
+
+[start]
+cmd = "node server.js"
