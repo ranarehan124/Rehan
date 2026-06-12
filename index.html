@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>NeonShare | Social Media Media Downloader</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="page-shell">
+    <header class="topbar">
+      <div class="brand">
+        <span class="brand-mark">N</span>
+        <div>
+          <h1>NeonShare</h1>
+          <p>All-in-one social media download, convert, and AI insight hub.</p>
+        </div>
+      </div>
+      <nav>
+        <a href="#download">Downloader</a>
+        <a href="#convert">Converter</a>
+        <a href="#ai">AI Assist</a>
+      </nav>
+    </header>
+
+    <main>
+      <section class="hero">
+        <div class="hero-copy">
+          <p class="eyebrow">Fast. Bold. Built for creators.</p>
+          <h2>Download any social media photo or video, convert to audio, and power it with AI.</h2>
+          <p>Support Instagram, TikTok, YouTube, X, Facebook, Reddit, and more with a high-energy UI built in charcoal, neon yellow, teal, and purple.</p>
+          <div class="hero-actions">
+            <a class="button button-primary" href="#download">Start Download</a>
+            <a class="button button-secondary" href="#ai">AI Insight</a>
+          </div>
+        </div>
+        <div class="hero-panel">
+          <div class="panel-tag">Social Media Toolkit</div>
+          <div class="panel-content">
+            <div class="metric-card">
+              <span>Platforms</span>
+              <strong>All major social apps</strong>
+            </div>
+            <div class="metric-card">
+              <span>Export</span>
+              <strong>Video, Audio, Photo</strong>
+            </div>
+            <div class="metric-card">
+              <span>AI</span>
+              <strong>Smart tags & captions</strong>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="download" class="panel glass-panel">
+        <div class="panel-title">
+          <h3>Social Media Downloader</h3>
+          <p>Paste any public post link and download the media instantly.</p>
+        </div>
+        <form id="downloadForm" class="control-grid">
+          <label>
+            URL
+            <input id="downloadUrl" type="url" placeholder="https://..." required />
+          </label>
+          <label>
+            Output
+            <select id="downloadType">
+              <option value="video">Video</option>
+              <option value="audio">Audio (MP3)</option>
+              <option value="image">Image</option>
+            </select>
+          </label>
+          <label>
+            Quality
+            <select id="downloadQuality">
+              <option value="best">Best</option>
+              <option value="medium">Medium</option>
+              <option value="low">Low</option>
+            </select>
+          </label>
+          <button type="submit" class="button button-accent">Download Now</button>
+        </form>
+        <div id="downloadStatus" class="status-card">Enter a social media URL and press download.</div>
+      </section>
+
+      <section id="convert" class="panel glass-panel">
+        <div class="panel-title">
+          <h3>Video-to-Audio Converter</h3>
+          <p>Convert downloaded videos to MP3 instantly with built-in FFmpeg support.</p>
+        </div>
+        <form id="convertForm" class="control-grid">
+          <label>
+            Media URL or file
+            <input id="convertUrl" type="url" placeholder="Paste download URL or video link" required />
+          </label>
+          <label>
+            Format
+            <select id="convertFormat">
+              <option value="mp3">MP3</option>
+              <option value="aac">AAC</option>
+            </select>
+          </label>
+          <button type="submit" class="button button-primary">Convert to Audio</button>
+        </form>
+        <div id="convertStatus" class="status-card">Use any video link and convert it to audio quickly.</div>
+      </section>
+
+      <section id="ai" class="panel glass-panel">
+        <div class="panel-title">
+          <h3>AI Assist</h3>
+          <p>Generate smart captions, hashtags, and content briefs from the media link.</p>
+        </div>
+        <form id="aiForm" class="control-grid">
+          <label>
+            Media URL
+            <input id="aiUrl" type="url" placeholder="Social media post URL" required />
+          </label>
+          <label>
+            AI Goal
+            <select id="aiGoal">
+              <option value="caption">Create caption</option>
+              <option value="hashtags">Generate hashtags</option>
+              <option value="summary">Summarize post</option>
+            </select>
+          </label>
+          <button type="submit" class="button button-secondary">Get AI Insights</button>
+        </form>
+        <div id="aiStatus" class="status-card">Set up your GROQ API key in the backend to use AI features.</div>
+      </section>
+
+      <section class="notes-panel">
+        <div class="note-card">
+          <h4>Supported Content</h4>
+          <p>Downloads from YouTube, TikTok, Instagram, X, Facebook, Reddit, Pinterest and more.</p>
+        </div>
+        <div class="note-card">
+          <h4>Performance</h4>
+          <p>Built with local Node.js backend, yt-dlp, ffmpeg static binaries, and optional Groq AI.</p>
+        </div>
+        <div class="note-card">
+          <h4>Ready to deploy</h4>
+          <p>Install locally in minutes. Use the included server or host on your own VPS.</p>
+        </div>
+      </section>
+    </main>
+  </div>
+  <script src="script.js"></script>
+</body>
+</html>
