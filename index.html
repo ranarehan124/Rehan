@@ -3,68 +3,695 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>RehanShare | Social Media Media Downloader</title>
+  <title>RehanShare | Social Media Downloader</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #080a0f;
+      --bg2: #0d1017;
+      --bg3: #12151c;
+      --surface: #161b24;
+      --surface2: #1c2230;
+      --border: rgba(255,255,255,0.07);
+      --border2: rgba(255,255,255,0.12);
+      --text: #f0f2f7;
+      --text2: #8a94a8;
+      --text3: #4e5768;
+      --accent: #4f7cff;
+      --accent2: #6e42e5;
+      --accent3: #00d4a8;
+      --accent-glow: rgba(79,124,255,0.18);
+      --font-head: 'Syne', sans-serif;
+      --font-body: 'DM Sans', sans-serif;
+      --r: 12px;
+      --r2: 18px;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font-body);
+      font-size: 15px;
+      line-height: 1.65;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* ── NOISE OVERLAY ── */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* ── AURORA BG ── */
+    .aurora {
+      position: fixed;
+      top: -40%;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 900px;
+      height: 600px;
+      background: radial-gradient(ellipse at 30% 40%, rgba(79,124,255,0.12) 0%, transparent 60%),
+                  radial-gradient(ellipse at 70% 60%, rgba(110,66,229,0.10) 0%, transparent 60%),
+                  radial-gradient(ellipse at 50% 20%, rgba(0,212,168,0.07) 0%, transparent 60%);
+      pointer-events: none;
+      z-index: 0;
+      animation: auroraShift 12s ease-in-out infinite alternate;
+    }
+
+    @keyframes auroraShift {
+      0%   { opacity: 0.7; transform: translateX(-50%) scale(1); }
+      100% { opacity: 1;   transform: translateX(-50%) scale(1.15) rotate(3deg); }
+    }
+
+    /* ── TOPBAR ── */
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 clamp(1.5rem, 5vw, 4rem);
+      height: 64px;
+      border-bottom: 1px solid var(--border);
+      background: rgba(8,10,15,0.75);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .brand-mark {
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--font-head);
+      font-weight: 800;
+      font-size: 18px;
+      color: #fff;
+      flex-shrink: 0;
+      box-shadow: 0 0 20px rgba(79,124,255,0.35);
+    }
+
+    .brand h1 {
+      font-family: var(--font-head);
+      font-size: 17px;
+      font-weight: 700;
+      letter-spacing: -0.3px;
+      color: var(--text);
+    }
+
+    .brand p {
+      display: none;
+    }
+
+    nav {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    nav a {
+      color: var(--text2);
+      text-decoration: none;
+      font-size: 13px;
+      font-weight: 500;
+      letter-spacing: 0.2px;
+      padding: 6px 14px;
+      border-radius: 8px;
+      border: 1px solid transparent;
+      transition: all 0.2s;
+    }
+
+    nav a:hover {
+      color: var(--text);
+      border-color: var(--border2);
+      background: var(--surface);
+    }
+
+    /* ── PAGE SHELL ── */
+    .page-shell {
+      position: relative;
+      z-index: 1;
+    }
+
+    main {
+      max-width: 860px;
+      margin: 0 auto;
+      padding: clamp(3rem, 8vw, 6rem) clamp(1.2rem, 4vw, 2rem) 5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 2rem;
+    }
+
+    /* ── HERO ── */
+    .hero {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2.5rem;
+      align-items: start;
+      padding-bottom: 1rem;
+    }
+
+    .eyebrow {
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 1.8px;
+      text-transform: uppercase;
+      color: var(--accent3);
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .eyebrow::before {
+      content: '';
+      display: block;
+      width: 20px;
+      height: 1px;
+      background: var(--accent3);
+    }
+
+    .hero-copy h2 {
+      font-family: var(--font-head);
+      font-size: clamp(1.8rem, 3.5vw, 2.6rem);
+      font-weight: 800;
+      line-height: 1.15;
+      letter-spacing: -1.5px;
+      color: var(--text);
+      margin-bottom: 1rem;
+    }
+
+    .hero-copy h2 em {
+      font-style: normal;
+      background: linear-gradient(90deg, var(--accent), var(--accent3));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .hero-copy > p {
+      font-size: 14px;
+      color: var(--text2);
+      line-height: 1.7;
+      margin-bottom: 1.75rem;
+      max-width: 400px;
+    }
+
+    .hero-actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    /* ── HERO PANEL ── */
+    .hero-panel {
+      position: sticky;
+      top: 82px;
+    }
+
+    .hero-stats {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--r2);
+      padding: 1.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1px;
+      overflow: hidden;
+    }
+
+    .panel-tag {
+      font-size: 10px;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: var(--text3);
+      font-weight: 600;
+      margin-bottom: 1rem;
+    }
+
+    .stat-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 0;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .stat-row:last-child { border-bottom: none; }
+
+    .stat-row span {
+      font-size: 12px;
+      color: var(--text3);
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+    }
+
+    .stat-row strong {
+      font-family: var(--font-head);
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text);
+      text-align: right;
+    }
+
+    .stat-dot {
+      display: inline-block;
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--accent3);
+      margin-right: 6px;
+      animation: pulse 2s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50%       { opacity: 0.3; }
+    }
+
+    /* ── SECTION HEADER ── */
+    .section-label {
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--text3);
+      margin-bottom: 0.5rem;
+    }
+
+    /* ── GLASS PANEL ── */
+    .glass-panel {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--r2);
+      padding: 2rem;
+      position: relative;
+      overflow: hidden;
+      transition: border-color 0.3s;
+    }
+
+    .glass-panel::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+    }
+
+    .glass-panel:hover {
+      border-color: var(--border2);
+    }
+
+    .panel-accent {
+      position: absolute;
+      top: -60px;
+      right: -60px;
+      width: 200px;
+      height: 200px;
+      border-radius: 50%;
+      pointer-events: none;
+    }
+
+    .panel-accent.blue { background: radial-gradient(circle, rgba(79,124,255,0.1) 0%, transparent 70%); }
+    .panel-accent.purple { background: radial-gradient(circle, rgba(110,66,229,0.1) 0%, transparent 70%); }
+    .panel-accent.teal { background: radial-gradient(circle, rgba(0,212,168,0.08) 0%, transparent 70%); }
+
+    .panel-title {
+      margin-bottom: 1.5rem;
+    }
+
+    .panel-title h3 {
+      font-family: var(--font-head);
+      font-size: 1.2rem;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+      color: var(--text);
+      margin-bottom: 4px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .panel-title h3 .icon-badge {
+      width: 28px;
+      height: 28px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      flex-shrink: 0;
+    }
+
+    .icon-badge.b  { background: rgba(79,124,255,0.15);  color: var(--accent); }
+    .icon-badge.p  { background: rgba(110,66,229,0.15);  color: #9b74ff; }
+    .icon-badge.t  { background: rgba(0,212,168,0.12);   color: var(--accent3); }
+
+    .panel-title p {
+      font-size: 13px;
+      color: var(--text2);
+      margin-left: 38px;
+    }
+
+    /* ── FORM GRID ── */
+    .control-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+    }
+
+    .control-grid label {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.8px;
+      text-transform: uppercase;
+      color: var(--text3);
+    }
+
+    .control-grid label:first-child {
+      grid-column: 1 / -1;
+    }
+
+    .control-grid input,
+    .control-grid select {
+      background: var(--bg2);
+      border: 1px solid var(--border2);
+      border-radius: var(--r);
+      color: var(--text);
+      font-family: var(--font-body);
+      font-size: 14px;
+      padding: 11px 14px;
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+      width: 100%;
+      appearance: none;
+      -webkit-appearance: none;
+    }
+
+    .control-grid select {
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%234e5768' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 14px center;
+      padding-right: 36px;
+      cursor: pointer;
+    }
+
+    .control-grid input:focus,
+    .control-grid select:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(79,124,255,0.12);
+    }
+
+    .control-grid input::placeholder {
+      color: var(--text3);
+    }
+
+    /* ── BUTTONS ── */
+    .button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 10px 22px;
+      border-radius: var(--r);
+      font-family: var(--font-body);
+      font-size: 13px;
+      font-weight: 500;
+      letter-spacing: 0.3px;
+      text-decoration: none;
+      cursor: pointer;
+      border: none;
+      transition: all 0.2s;
+      white-space: nowrap;
+    }
+
+    .button:active { transform: scale(0.97); }
+
+    .button-primary {
+      background: linear-gradient(135deg, var(--accent), #3a66ff);
+      color: #fff;
+      box-shadow: 0 0 0 1px rgba(79,124,255,0.3), 0 4px 20px rgba(79,124,255,0.25);
+    }
+
+    .button-primary:hover {
+      box-shadow: 0 0 0 1px rgba(79,124,255,0.5), 0 6px 28px rgba(79,124,255,0.38);
+      transform: translateY(-1px);
+    }
+
+    .button-secondary {
+      background: var(--surface2);
+      color: var(--text);
+      border: 1px solid var(--border2);
+    }
+
+    .button-secondary:hover {
+      background: var(--surface);
+      border-color: rgba(255,255,255,0.2);
+    }
+
+    .button-accent {
+      background: linear-gradient(135deg, var(--accent2), #5535cc);
+      color: #fff;
+      box-shadow: 0 0 0 1px rgba(110,66,229,0.35), 0 4px 20px rgba(110,66,229,0.25);
+    }
+
+    .button-accent:hover {
+      box-shadow: 0 0 0 1px rgba(110,66,229,0.5), 0 6px 28px rgba(110,66,229,0.4);
+      transform: translateY(-1px);
+    }
+
+    .button-teal {
+      background: linear-gradient(135deg, #00b896, #009878);
+      color: #fff;
+      box-shadow: 0 0 0 1px rgba(0,212,168,0.3), 0 4px 20px rgba(0,212,168,0.2);
+    }
+
+    .button-teal:hover {
+      box-shadow: 0 0 0 1px rgba(0,212,168,0.5), 0 6px 28px rgba(0,212,168,0.35);
+      transform: translateY(-1px);
+    }
+
+    /* Submit button spans full width */
+    .control-grid button[type="submit"] {
+      grid-column: 1 / -1;
+      width: 100%;
+    }
+
+    /* ── STATUS CARD ── */
+    .status-card {
+      margin-top: 1rem;
+      padding: 12px 16px;
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: var(--r);
+      font-size: 13px;
+      color: var(--text2);
+      min-height: 44px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .status-card::before {
+      content: '';
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--text3);
+      flex-shrink: 0;
+    }
+
+    /* ── NOTES PANEL ── */
+    .notes-panel {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+    }
+
+    .note-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--r);
+      padding: 1.25rem;
+      transition: border-color 0.25s;
+    }
+
+    .note-card:hover {
+      border-color: var(--border2);
+    }
+
+    .note-card h4 {
+      font-family: var(--font-head);
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: -0.2px;
+      color: var(--text);
+      margin-bottom: 6px;
+    }
+
+    .note-card p {
+      font-size: 12.5px;
+      color: var(--text2);
+      line-height: 1.6;
+    }
+
+    .note-icon {
+      width: 32px;
+      height: 32px;
+      border-radius: 9px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      margin-bottom: 12px;
+    }
+
+    /* ── DIVIDER ── */
+    .divider {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 0.5rem 0;
+    }
+
+    .divider span {
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--text3);
+      flex-shrink: 0;
+    }
+
+    .divider::before, .divider::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+    }
+
+    /* ── ANIMATIONS ── */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .hero-copy { animation: fadeUp 0.6s ease both; }
+    .hero-panel { animation: fadeUp 0.6s 0.1s ease both; }
+    .glass-panel { animation: fadeUp 0.5s ease both; }
+    #download  { animation-delay: 0.15s; }
+    #convert   { animation-delay: 0.22s; }
+    #ai        { animation-delay: 0.29s; }
+    .notes-panel { animation: fadeUp 0.5s 0.35s ease both; }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 680px) {
+      .hero { grid-template-columns: 1fr; }
+      .hero-panel { position: static; }
+      .control-grid { grid-template-columns: 1fr; }
+      .notes-panel { grid-template-columns: 1fr; }
+      nav a { font-size: 12px; padding: 5px 10px; }
+    }
+  </style>
 </head>
 <body>
+  <div class="aurora"></div>
+
   <div class="page-shell">
     <header class="topbar">
       <div class="brand">
-        <span class="brand-mark">N</span>
+        <span class="brand-mark">R</span>
         <div>
           <h1>RehanShare</h1>
-          <p>All-in-one social media download, convert, and AI insight hub.</p>
         </div>
       </div>
       <nav>
-        <a href="#download">Downloader</a>
-        <a href="#convert">Converter</a>
-        <a href="#ai">AI Assist</a>
+        <a href="#download">Download</a>
+        <a href="#convert">Convert</a>
+        <a href="#ai">AI</a>
       </nav>
     </header>
 
     <main>
+      <!-- HERO -->
       <section class="hero">
         <div class="hero-copy">
-          <p class="eyebrow">Fast. Bold. Built for creators.</p>
-          <h2>Download any social media photo or video, convert to audio, and power it with AI.</h2>
-          <p>Support Instagram, TikTok, YouTube, X, Facebook, Reddit, and more 0 ads Gift from Rehan the coder and tricker .</p>
+          <p class="eyebrow">Built for creators</p>
+          <h2>Download. Convert. <em>Power it with AI.</em></h2>
+          <p>Pull video, audio, and photos from any major platform — Instagram, TikTok, YouTube, X, Reddit, and more. Zero ads. A gift from Rehan.</p>
           <div class="hero-actions">
-            <a class="button button-primary" href="#download">Start Download</a>
+            <a class="button button-primary" href="#download">↓ Start Download</a>
             <a class="button button-secondary" href="#ai">AI Insight</a>
           </div>
         </div>
+
         <div class="hero-panel">
-          <div class="panel-tag">Social Media Toolkit</div>
-          <div class="panel-content">
-            <div class="metric-card">
+          <div class="hero-stats">
+            <p class="panel-tag">Platform status</p>
+            <div class="stat-row">
               <span>Platforms</span>
-              <strong>All major social apps</strong>
+              <strong><span class="stat-dot"></span>All major apps</strong>
             </div>
-            <div class="metric-card">
+            <div class="stat-row">
               <span>Export</span>
-              <strong>Video, Audio, Photo</strong>
+              <strong>Video · Audio · Photo</strong>
             </div>
-            <div class="metric-card">
+            <div class="stat-row">
+              <span>Engine</span>
+              <strong>yt-dlp + ffmpeg</strong>
+            </div>
+            <div class="stat-row">
               <span>AI</span>
-              <strong>Smart tags & captions</strong>
+              <strong>Groq-powered</strong>
             </div>
           </div>
         </div>
       </section>
 
+      <div class="divider"><span>Tools</span></div>
+
+      <!-- DOWNLOADER -->
       <section id="download" class="panel glass-panel">
+        <div class="panel-accent blue"></div>
         <div class="panel-title">
-          <h3>Social Media Downloader</h3>
-          <p>Paste any public post link and download the media instantly.</p>
+          <h3>
+            <span class="icon-badge b">↓</span>
+            Social Media Downloader
+          </h3>
+          <p>Paste any public post URL and download media instantly.</p>
         </div>
         <form id="downloadForm" class="control-grid">
           <label>
             URL
-            <input id="downloadUrl" type="url" placeholder="https://..." required />
+            <input id="downloadUrl" type="url" placeholder="https://www.instagram.com/p/..." required />
           </label>
           <label>
-            Output
+            Output Format
             <select id="downloadType">
               <option value="video">Video</option>
               <option value="audio">Audio (MP3)</option>
@@ -84,18 +711,23 @@
         <div id="downloadStatus" class="status-card">Enter a social media URL and press download.</div>
       </section>
 
+      <!-- CONVERTER -->
       <section id="convert" class="panel glass-panel">
+        <div class="panel-accent purple"></div>
         <div class="panel-title">
-          <h3>Video-to-Audio Converter</h3>
-          <p>Convert downloaded videos to MP3 instantly with built-in FFmpeg support.</p>
+          <h3>
+            <span class="icon-badge p">♪</span>
+            Video-to-Audio Converter
+          </h3>
+          <p>Convert any video to MP3 or AAC with built-in FFmpeg support.</p>
         </div>
         <form id="convertForm" class="control-grid">
           <label>
-            Media URL or file
-            <input id="convertUrl" type="url" placeholder="Paste download URL or video link" required />
+            Media URL or File
+            <input id="convertUrl" type="url" placeholder="Paste a video link or download URL" required />
           </label>
           <label>
-            Format
+            Output Format
             <select id="convertFormat">
               <option value="mp3">MP3</option>
               <option value="aac">AAC</option>
@@ -106,10 +738,15 @@
         <div id="convertStatus" class="status-card">Use any video link and convert it to audio quickly.</div>
       </section>
 
+      <!-- AI ASSIST -->
       <section id="ai" class="panel glass-panel">
+        <div class="panel-accent teal"></div>
         <div class="panel-title">
-          <h3>AI Assist</h3>
-          <p>Generate smart captions, hashtags, and content briefs from the media link.</p>
+          <h3>
+            <span class="icon-badge t">✦</span>
+            AI Assist
+          </h3>
+          <p>Generate smart captions, hashtags, and content briefs from any media link.</p>
         </div>
         <form id="aiForm" class="control-grid">
           <label>
@@ -124,27 +761,32 @@
               <option value="summary">Summarize post</option>
             </select>
           </label>
-          <button type="submit" class="button button-secondary">Get AI Insights</button>
+          <button type="submit" class="button button-teal">Get AI Insights</button>
         </form>
         <div id="aiStatus" class="status-card">Set up your GROQ API key in the backend to use AI features.</div>
       </section>
 
+      <!-- NOTES -->
       <section class="notes-panel">
         <div class="note-card">
+          <div class="note-icon" style="background:rgba(79,124,255,0.1);color:var(--accent);">⊕</div>
           <h4>Supported Content</h4>
-          <p>Downloads from YouTube, TikTok, Instagram, X, Facebook, Reddit, Pinterest and more.</p>
+          <p>YouTube, TikTok, Instagram, X, Facebook, Reddit, Pinterest, and many more platforms.</p>
         </div>
         <div class="note-card">
+          <div class="note-icon" style="background:rgba(110,66,229,0.1);color:#9b74ff;">⚡</div>
           <h4>Performance</h4>
-          <p>Built with local Node.js backend, yt-dlp, ffmpeg static binaries, and optional Groq AI.</p>
+          <p>Local Node.js backend with yt-dlp and ffmpeg static binaries for fast processing.</p>
         </div>
         <div class="note-card">
-          <h4>Ready to deploy</h4>
-          <p>Install locally in minutes. Use the included server or host on your own VPS.</p>
+          <div class="note-icon" style="background:rgba(0,212,168,0.1);color:var(--accent3);">◈</div>
+          <h4>Deploy Anywhere</h4>
+          <p>Install locally in minutes or host on your own VPS. No external dependencies.</p>
         </div>
       </section>
     </main>
   </div>
+
   <script src="script.js"></script>
 </body>
 </html>
